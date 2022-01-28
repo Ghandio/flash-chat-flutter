@@ -5,14 +5,15 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatScreen extends StatefulWidget {
-  static const String id='chat_screen';
+  static const String id = 'chat_screen';
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final _firestore=FirebaseFirestore.instance;
-  final _auth=FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
   User loggedInUser;
   String messageText;
 
@@ -22,23 +23,31 @@ class _ChatScreenState extends State<ChatScreen> {
     getCurrentUser();
   }
 
-  void getCurrentUser(){
-    try{
-      final user=  _auth.currentUser;
-      if(user!=null){
-        loggedInUser=user;
+  void getCurrentUser() {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
       }
-    }
-    catch(e){
+    } catch (e) {
       print(e);
     }
   }
-  void getMessages()async{
-    final messages= await _firestore.collection('messages').get();
-    for(var message in messages.docs){
-      print(message.data());
+
+  // void getMessages()async{
+  //   final messages= await _firestore.collection('messages').get();
+  //   for(var message in messages.docs){
+  //     print(message.data());
+  //   }
+  // }
+  void messagesStream() async {
+    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+      for (var message in snapshot.docs) {
+        print(message.data());
+      }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 //Implement logout functionality
                 // _auth.signOut();
                 // Navigator.pop(context);
-                getMessages();
+                messagesStream();
               }),
         ],
         title: Text('⚡️Chat'),
@@ -62,6 +71,29 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder<QuerySnapshot>(
+              stream: _firestore.collection('messages').snapshots(),
+              builder: (context, snapshot) {
+                List<Text> messageWidgets = [];
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.lightBlueAccent,
+                    ),
+                  );
+                }
+                  final messages = snapshot.data.docs;
+                  for (var message in messages) {
+                    final messageText = message.get('text');
+                    final messageSender = message.get('sender');
+                    final messageWidget =
+                        Text('$messageSender said $messageText');
+                    messageWidgets.add(messageWidget);
+                  }
+
+                return Column(children: messageWidgets);
+              },
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -71,7 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: TextField(
                       onChanged: (value) {
                         //Do something with the user input.
-                        messageText=value;
+                        messageText = value;
                       },
                       decoration: kMessageTextFieldDecoration,
                     ),
@@ -79,10 +111,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   TextButton(
                     onPressed: () {
                       //Implement send functionality.
-                      _firestore.collection('messages').add({
-                        'text':messageText,
-                        'sender':loggedInUser.email
-                      });
+                      _firestore.collection('messages').add(
+                          {'text': messageText, 'sender': loggedInUser.email});
                     },
                     child: Text(
                       'Send',
