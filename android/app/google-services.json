@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "636404996179",
+    "project_id": "flash-chat-522ab",
+    "storage_bucket": "flash-chat-522ab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:636404996179:android:61ef0dea86ecd9aa108ea6",
+        "android_client_info": {
+          "package_name": "co.ghandi.flash_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "636404996179-21hi2q3cvoufrakqs1ipdgcmvklfaea6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9Tb16BJVMVmxaOL_sb4aML0d7iE2qDOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "636404996179-21hi2q3cvoufrakqs1ipdgcmvklfaea6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
